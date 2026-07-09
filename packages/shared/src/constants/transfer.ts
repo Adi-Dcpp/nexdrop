@@ -1,4 +1,3 @@
-
 export const DEFAULT_CHUNK_SIZE = 64 * 1024;
 
 export const MAX_FILE_SIZE = 20 * 1024 * 1024 * 1024;
