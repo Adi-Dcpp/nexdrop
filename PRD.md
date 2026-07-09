@@ -2,15 +2,15 @@
 
 ## 1. Executive Summary
 
-NexDrop is a production-quality peer-to-peer file sharing web application that enables users to transfer files directly between browsers using WebRTC Data Channels. The product is designed to be fast, private, and frictionless: users open the site, create or join a room, connect with another device, and exchange files without uploading the payload to any server.
+NexDrop is a production-quality peer-to-peer browser application that enables users to message, video call, and transfer files directly between browsers using WebRTC. The product is designed to be fast, private, and frictionless: users open the site, create or join a room, connect with another device, and exchange messages, video, and files without uploading the payload to any server.
 
 The backend is intentionally narrow in scope. It exists only to facilitate signaling, room coordination, and lifecycle management. It must never receive file bytes, store files, or become part of the data transfer path. This architecture makes the product privacy-first by design while preserving the performance advantages of direct browser-to-browser transfer.
 
-NexDrop targets users who want a modern alternative to Snapdrop, PairDrop, Wormhole, and LocalSend, with a strong emphasis on browser compatibility, mobile support, and a polished real-time experience.
+NexDrop targets users who want a modern alternative to Snapdrop, PairDrop, Wormhole, LocalSend, and lightweight browser calling tools, with a strong emphasis on browser compatibility, mobile support, and a polished real-time experience.
 
 ## 2. Vision
 
-Build the fastest, simplest, and most privacy-preserving way to send files directly between browsers without uploading them to a central server.
+Build the fastest, simplest, and most privacy-preserving way to message, video call, and send files directly between browsers without uploading them to a central server.
 
 The product should feel instant, trustworthy, and modern, while supporting real-world transfer workloads and clear paths toward production scaling.
 
@@ -22,12 +22,13 @@ Current file sharing workflows often force users into one of three poor options:
 - Native app-based transfer tools that are fragmented across operating systems and often unavailable in browser-first workflows.
 - Legacy sharing tools that are fast but inconsistent, limited in scale, or weak on UX and mobile support.
 
-Users need a browser-native way to move files between devices with minimal setup, no account friction, and strong privacy guarantees. They also need confidence that the service provider cannot access the file contents.
+Users need a browser-native way to message, call, and move files between devices with minimal setup, no account friction, and strong privacy guarantees. They also need confidence that the service provider cannot access their media, messages, or file contents.
 
 ## 4. Goals
 
 - Enable browser-to-browser file transfer with no server-side file storage.
-- Use WebRTC and RTCDataChannel for the actual data path.
+- Enable browser-to-browser messaging and video calling with no server-side media storage.
+- Use WebRTC for the actual peer-to-peer data and media path.
 - Keep the signaling server out of the file transfer path.
 - Provide a beautiful, intuitive, mobile-friendly UI.
 - Support link and QR-based sharing for fast room joining.
@@ -67,10 +68,12 @@ Cares deeply that files are never stored or inspected by the service provider an
 - As a sender, I want to create a room and share it quickly so another device can connect.
 - As a receiver, I want to join a room by link or QR code so I can start receiving files immediately.
 - As a sender, I want to select one or more files and transfer them without opening another app.
+- As a user, I want to start a video call so I can talk face to face with the other peer.
 - As a sender, I want to see transfer progress, speed, and ETA so I know whether the transfer is healthy.
 - As a receiver, I want received files to download automatically or with one click.
 - As a user, I want to cancel a transfer if I chose the wrong file or no longer need it.
 - As a user, I want text chat so I can coordinate what I am sending.
+- As a user, I want video calling so I can communicate live while sharing files.
 - As a mobile user, I want the interface to work well on small screens and in portrait mode.
 - As a privacy-conscious user, I want assurance that the server never sees file contents.
 
@@ -82,6 +85,9 @@ Cares deeply that files are never stored or inspected by the service provider an
 - Join room.
 - Establish peer connection.
 - Send text messages.
+- Start and end video calls.
+- Mute and unmute microphone and camera.
+- Preview local video before joining a call.
 - Transfer files.
 - Transfer multiple files.
 - Show progress indicator.
@@ -212,6 +218,7 @@ The server must never:
 - Create or join rooms.
 - Manage WebRTC lifecycle.
 - Manage DataChannel lifecycle.
+- Manage media tracks and call state.
 - Select files.
 - Chunk files.
 - Send chunks.
@@ -223,7 +230,7 @@ The server must never:
 
 ## 12. Networking Architecture
 
-- WebRTC is the transport for file and message data.
+- WebRTC is the transport for file, message, and video data.
 - Socket.io is the transport for signaling only.
 - STUN servers are used for NAT traversal.
 - TURN support is reserved for future versions to improve connectivity in restrictive network environments.
@@ -240,7 +247,8 @@ The server must never:
 6. Both sides exchange ICE candidates.
 7. Once ICE negotiation succeeds, the peer connection becomes stable.
 8. A RTCDataChannel opens for text and file transfer.
-9. Payloads are exchanged directly between browsers.
+9. Media tracks are exchanged directly between browsers for video calling.
+10. Payloads are exchanged directly between browsers.
 
 ## 14. Signaling Flow
 
@@ -493,6 +501,8 @@ The canonical signaling channel should remain Socket.io rather than expanding in
 
 - Landing page.
 - Room creation and join controls.
+- Text chat panel.
+- Video call panel with local and remote previews.
 - QR code display component.
 - Connection status panel.
 - File picker and drag-and-drop zone.
@@ -549,6 +559,7 @@ packages/
 
 - React application.
 - WebRTC UI and client-side transport.
+- Messaging and video call UI.
 - File transfer presentation and state.
 
 ### 21.2 `apps/server`

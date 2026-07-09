@@ -1,3 +1,3 @@
 # NexDrop
 
-Peer-to-peer file sharing over WebRTC Data Channels.
+Peer-to-peer messaging, video calling, and data transfer over WebRTC.
